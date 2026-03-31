@@ -1,0 +1,61 @@
+name: Build APK
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout codice
+        uses: actions/checkout@v3
+
+      - name: Installa dipendenze di sistema
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            python3-pip \
+            build-essential \
+            git \
+            ffmpeg \
+            libsdl2-dev \
+            libsdl2-image-dev \
+            libsdl2-mixer-dev \
+            libsdl2-ttf-dev \
+            libportmidi-dev \
+            libswscale-dev \
+            libavformat-dev \
+            libavcodec-dev \
+            zlib1g-dev \
+            libgstreamer1.0-dev \
+            gstreamer1.0-plugins-base \
+            gstreamer1.0-plugins-good \
+            libltdl-dev \
+            zip \
+            unzip \
+            openjdk-17-jdk
+
+      - name: Installa Buildozer e Cython
+        run: |
+          pip3 install --upgrade buildozer cython
+
+      - name: Cache Buildozer
+        uses: actions/cache@v3
+        with:
+          path: ~/.buildozer
+          key: buildozer-${{ hashFiles('buildozer.spec') }}
+          restore-keys: |
+            buildozer-
+
+      - name: Compila APK
+        run: |
+          buildozer -v android debug
+
+      - name: Carica APK come artefatto
+        uses: actions/upload-artifact@v3
+        with:
+          name: manga-downloader-apk
+          path: bin/*.apk
