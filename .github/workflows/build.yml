@@ -11,7 +11,7 @@ jobs:
 
     steps:
       - name: Checkout codice
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Installa dipendenze di sistema
         run: |
@@ -20,30 +20,27 @@ jobs:
             python3-pip \
             build-essential \
             git \
-            ffmpeg \
-            libsdl2-dev \
-            libsdl2-image-dev \
-            libsdl2-mixer-dev \
-            libsdl2-ttf-dev \
-            libportmidi-dev \
-            libswscale-dev \
-            libavformat-dev \
-            libavcodec-dev \
-            zlib1g-dev \
-            libgstreamer1.0-dev \
-            gstreamer1.0-plugins-base \
-            gstreamer1.0-plugins-good \
-            libltdl-dev \
             zip \
             unzip \
-            openjdk-17-jdk
+            openjdk-17-jdk \
+            autoconf \
+            libtool \
+            pkg-config \
+            zlib1g-dev \
+            libncurses5-dev \
+            libncursesw5-dev \
+            libtinfo5 \
+            cmake \
+            libffi-dev \
+            libssl-dev
 
       - name: Installa Buildozer e Cython
         run: |
-          pip3 install --upgrade buildozer cython
+          pip3 install --upgrade pip
+          pip3 install --upgrade buildozer cython virtualenv
 
       - name: Cache Buildozer
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/.buildozer
           key: buildozer-${{ hashFiles('buildozer.spec') }}
@@ -52,10 +49,17 @@ jobs:
 
       - name: Compila APK
         run: |
-          buildozer -v android debug
+          buildozer -v android debug 2>&1 | tee build.log
 
       - name: Carica APK come artefatto
         uses: actions/upload-artifact@v4
         with:
           name: manga-downloader-apk
           path: bin/*.apk
+
+      - name: Carica log in caso di errore
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-log
+          path: build.log
