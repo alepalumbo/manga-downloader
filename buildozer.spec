@@ -3,7 +3,6 @@ title = Manga Downloader
 package.name = mangadownloader
 package.domain = org.manga
 source.dir = .
-source.main = manga_downloader.py
 source.include_exts = py,png,jpg,kv,atlas
 version = 1.0
 
