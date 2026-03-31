@@ -55,7 +55,7 @@ jobs:
           buildozer -v android debug
 
       - name: Carica APK come artefatto
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: manga-downloader-apk
           path: bin/*.apk
